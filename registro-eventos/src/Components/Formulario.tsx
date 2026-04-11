@@ -1,8 +1,11 @@
 import { Participante } from "../Models/Participante";
 import { useState } from "react";
-interface FormularioProps{onAgregar:(nuevo:Participante)=>void, contador:number}
-export const Formulario=({onAgregar,contador}:FormularioProps)=>{
-     const [formData,setFormData]=useState<Omit<Participante, 'id'>>({
+import { useContext } from "react";
+import { ParticipantesContext } from "../context/ParticipantesContext";
+export const Formulario=()=>{
+    const context=useContext(ParticipantesContext)
+    if(!context) return null //nuevo tp 4
+  const [formData,setFormData]=useState<Omit<Participante, 'id'>>({
         nombre: '',
         email: '',
         edad: 0,
@@ -50,7 +53,8 @@ export const Formulario=({onAgregar,contador}:FormularioProps)=>{
     formData.aceptaTerminos
   );
     
-    onAgregar(nuevoParticipante)
+    //onAgregar(nuevoParticipante) 
+    context.agregar(nuevoParticipante) //nuevo tp 4
     setFormData({
     nombre: '',
     email: '',
@@ -63,10 +67,10 @@ export const Formulario=({onAgregar,contador}:FormularioProps)=>{
     })
   }
 return(
-<div className='contenedor_registro'> 
+<div > 
          <h1 className=' bg-green-600 p-4 text-3xl font-bold text-center mb-6'>Registro de participantes</h1>
-         <h3 className='font-bold text-xl my-5'>Participantes registrados: {contador}</h3>
-         <form onSubmit={handleSubmit} className='' >
+         <h3 className='font-bold text-xl my-5'>Participantes registrados: {context.contador}</h3>
+         <form onSubmit={handleSubmit} className='shadow-md' >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <input type="text" className="my-3 mx-2 border p-2 rounded" name='nombre' value={formData.nombre} placeholder='Nombre' onChange={handleChange} required /> 
           <input type="email" className="my-3 mx-2 border p-2 rounded" name='email' value={formData.email} placeholder='Email' onChange={handleChange} required /> 

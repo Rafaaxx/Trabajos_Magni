@@ -1,6 +1,9 @@
 import type { Participante } from "../Models/Participante"
-interface ParticipanteCardProps{p:Participante, onEliminar: (id:number)=>void}
-export const ParticipanteCard=({p,onEliminar}:ParticipanteCardProps)=>{
+import { useContext } from "react"
+import { ParticipantesContext } from "../context/ParticipantesContext"
+export const ParticipanteCard=({p}:{p:Participante})=>{
+  const context=useContext(ParticipantesContext)
+  if (!context) return null
 const bgColor=
   p.nivel==="Principiante"?"bg-green-100":
   p.nivel==="Intermedio"?"bg-yellow-100":
@@ -16,7 +19,7 @@ const bgColor=
         <p className='mb-1'>Modalidad:{p.modalidad}</p>
         <p className={`${nivelColor} font-bold mb-3`}>Nivel:{p.nivel}</p>
         <p>Tecnologias: {p.tecnologias.join(" - ")}</p>
-        <button className="bg-red-600 text-white rounded mt-3 py-2 px-3" onClick={()=>onEliminar(p.id)}>Eliminar</button>
+        <button className="bg-red-600 text-white rounded mt-3 py-2 px-3" onClick={()=>context.eliminar(p.id)}>Eliminar</button>
         </div>
   )
 }
