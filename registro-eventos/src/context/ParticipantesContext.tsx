@@ -1,9 +1,11 @@
-
-import { createContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useEffect, useReducer, useState, type ReactNode } from "react";
 import { Participante } from "../Models/Participante";
-
+import { participantesReducer } from "../reducers/participantesReducer";
 interface ContextType{
     participante:Participante[],
+    participanteSeleccionado:Participante|null,
+    setParticipanteSeleccionado:(p:Participante|null)=>void,
+    actualizar:(p:Participante)=>void,
     agregar: (p:Participante)=>void,
     eliminar:(id:number)=>void,
     resetear:()=>void,
@@ -12,8 +14,10 @@ interface ContextType{
 export const ParticipantesContext= createContext<ContextType |undefined> (undefined)
 
 export const ParticipantesProvider=({children}:{children:ReactNode})=>{
-    const [participantes,setParticipantes]=useState<Participante[]>([])
+    const [participantes,dispatch]=useReducer(participantesReducer,[])
     const api_url="http://localhost:8000/participantes"
+    let contador=participantes.length
+    const [participanteSeleccionado,setParticipanteSeleccionado]=useState<Participante|null>(null)
     const agregarParticipante=async (nuevoParticipante:Participante)=>{
      try{
       const respuesta= await fetch(api_url,{
@@ -25,7 +29,7 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
     })
     if (respuesta.ok){
       const guardado=await respuesta.json()
-      setParticipantes((prev)=>[...prev,guardado])
+      dispatch({type:"AGREGAR",payload:guardado})
     }
     }  catch(error){
       console.error("Error al agregar participante:",error)
@@ -34,7 +38,7 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
     useEffect(()=>{
         fetch(api_url)
         .then(res=>res.json())
-        .then(data=>setParticipantes(data))
+        .then(data=>{dispatch({type:"GET_PARTICIPANTES",payload:data})})
       },[])
       const eliminarParticipante=async(id:number)=>{
         try{
@@ -42,7 +46,7 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
           method:"DELETE"
          })
          if (respuesta.ok){
-         setParticipantes((prev)=>prev.filter(p=>p.id!==id)) 
+         dispatch({type:"ELIMINAR",payload:id}) 
       }
     }catch(error){
       console.error("Error al eliminar participante:",error)
@@ -53,13 +57,32 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
         method:"DELETE"
        })
        if (respuesta.ok){
-        setParticipantes([])
+        dispatch({type:"RESET"})
       }
     }
-     let contador=participantes.length
+    const actualizarparticipante=async(participante:Participante)=>{
+      try{
+         const respuesta= await fetch(`${api_url}/${participante.id}`,{
+          method:"PUT",
+          headers:{
+          "Content-Type":"application/json"
+        },
+          body: JSON.stringify(participante)
+         })
+         if (respuesta.ok){
+          dispatch({type:"EDITAR",payload:participante})
+          setParticipanteSeleccionado(null)
+         }
+      }catch(error){
+        console.error(error)
+      }
+    }
    return(
         <ParticipantesContext.Provider value={{
          participante:participantes,
+         participanteSeleccionado:participanteSeleccionado,
+         setParticipanteSeleccionado:setParticipanteSeleccionado,
+         actualizar:actualizarparticipante,
          agregar:agregarParticipante,
          eliminar:eliminarParticipante,
          resetear:reseteardatos,

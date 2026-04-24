@@ -1,5 +1,5 @@
 import { Participante } from "../Models/Participante";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useContext } from "react";
 import { ParticipantesContext } from "../context/ParticipantesContext";
 export const Formulario=()=>{
@@ -38,10 +38,15 @@ export const Formulario=()=>{
   };
   const handleSubmit=(e:React.FormEvent)=>{
     e.preventDefault()
+
     if (!formData.aceptaTerminos){
       alert("Debe aceptar los términos y condiciones.")
       return
     }
+    
+    
+    //onAgregar(nuevoParticipante) 
+    if(!context.participanteSeleccionado){
     const nuevoParticipante=new Participante(
     formData.nombre,
     formData.email,
@@ -52,9 +57,15 @@ export const Formulario=()=>{
     formData.nivel as any,
     formData.aceptaTerminos
   );
-    
-    //onAgregar(nuevoParticipante) 
     context.agregar(nuevoParticipante) //nuevo tp 4
+    }
+    else{
+      const participanteActualizado={
+        ...formData,
+        id:context.participanteSeleccionado.id
+      } as Participante   
+      context.actualizar(participanteActualizado)
+    }
     setFormData({
     nombre: '',
     email: '',
@@ -66,6 +77,20 @@ export const Formulario=()=>{
     aceptaTerminos: false
     })
   }
+  useEffect(()=>{
+     if (context.participanteSeleccionado){
+      setFormData({
+        nombre: context.participanteSeleccionado.nombre,
+        email: context.participanteSeleccionado.email,
+        edad: context.participanteSeleccionado.edad,
+        pais: context.participanteSeleccionado.pais,
+        modalidad: context.participanteSeleccionado.modalidad,
+        tecnologias: context.participanteSeleccionado.tecnologias,
+        nivel: context.participanteSeleccionado.nivel,
+        aceptaTerminos: context.participanteSeleccionado.aceptaTerminos
+      })
+     }
+  },[context.participanteSeleccionado])
 return(
 <div > 
          <h1 className=' bg-green-600 p-4 text-3xl font-bold text-center mb-6'>Registro de participantes</h1>
@@ -105,7 +130,7 @@ return(
           </div>
           <label> <input type="checkbox" className="my-3 mx-2"  name="aceptaTerminos" checked={formData.aceptaTerminos} onChange={(e)=> setFormData({...formData,aceptaTerminos:e.target.checked})}/>Acepto los términos y condiciones del evento</label>
           <div className='mt-4'>
-         <button type='submit' className='bg-blue-600 rounded text-white md:col-span-3 py-2 px-4 hover:bg-blue-700'>Registrar</button>
+         <button type='submit' className='bg-blue-600 rounded text-white md:col-span-3 py-2 px-4 hover:bg-blue-700'>{context.participanteSeleccionado ? "Guardar Cambios" : "Registrar"}</button>
          </div>
          </form>
       </div>

@@ -19,7 +19,10 @@ const bgColor=
         <p className='mb-1'>Modalidad:{p.modalidad}</p>
         <p className={`${nivelColor} font-bold mb-3`}>Nivel:{p.nivel}</p>
         <p>Tecnologias: {p.tecnologias.join(" - ")}</p>
+        <div className="flex justify-left items-left">
+        <button className="bg-blue-600 text-white rounded mt-3 py-2 px-3" onClick={()=>context.setParticipanteSeleccionado(p)}>Editar</button>
         <button className="bg-red-600 text-white rounded mt-3 py-2 px-3" onClick={()=>context.eliminar(p.id)}>Eliminar</button>
+       </div>
         </div>
   )
 }
