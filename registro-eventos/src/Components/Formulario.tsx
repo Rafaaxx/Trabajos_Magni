@@ -2,7 +2,7 @@ import { Participante } from "../Models/Participante";
 import { useState, useEffect } from "react";
 import { useContext } from "react";
 import { ParticipantesContext } from "../context/ParticipantesContext";
-export const Formulario=()=>{
+export const Formulario=({onSuccess}:any)=>{
     const context=useContext(ParticipantesContext)
     if(!context) return null //nuevo tp 4
   const [formData,setFormData]=useState<Omit<Participante, 'id'>>({
@@ -76,6 +76,7 @@ export const Formulario=()=>{
     nivel: 'Principiante',
     aceptaTerminos: false
     })
+    onSuccess()
   }
   useEffect(()=>{
      if (context.participanteSeleccionado){
@@ -89,11 +90,22 @@ export const Formulario=()=>{
         nivel: context.participanteSeleccionado.nivel,
         aceptaTerminos: context.participanteSeleccionado.aceptaTerminos
       })
+     }else{
+      setFormData({
+        nombre: '',
+        email: '',
+        edad: 0,
+        pais: 'Argentina',
+        modalidad: 'Presencial',
+        tecnologias: [],
+        nivel: 'Principiante',
+        aceptaTerminos: false
+      })
      }
   },[context.participanteSeleccionado])
 return(
 <div > 
-         <h1 className=' bg-green-600 p-4 text-3xl font-bold text-center mb-6'>Registro de participantes</h1>
+         <h1 className=' bg-blue-500 p-4 text-3xl font-bold text-center mb-6'>Registro de participantes</h1>
          <h3 className='font-bold text-xl my-5'>Participantes registrados: {context.contador}</h3>
          <form onSubmit={handleSubmit} className='shadow-md' >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

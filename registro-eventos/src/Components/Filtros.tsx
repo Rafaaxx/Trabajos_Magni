@@ -30,6 +30,6 @@ return(
             <option value="Avanzado">Avanzado</option>
           </select>
           </div>
-          <button className="bg-gray-400 font-bold rounded p-2"onClick={()=>{setModalidad("Todas"),setNivel("Todos"),setNombre("")}}>Limpiar filtros</button>
+          <button className="bg-gray-400 font-bold rounded p-2"onClick={()=>{setModalidad("todas"),setNivel("todos"),setNombre("")}}>Limpiar filtros</button>
          </div>
 )}
