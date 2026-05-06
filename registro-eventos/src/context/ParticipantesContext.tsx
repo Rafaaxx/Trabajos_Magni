@@ -19,10 +19,12 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
     let contador=participantes.length
     const [participanteSeleccionado,setParticipanteSeleccionado]=useState<Participante|null>(null)
     const agregarParticipante=async (nuevoParticipante:Participante)=>{
-     try{
+     const token = localStorage.getItem("token")
+      try{
       const respuesta= await fetch(api_url,{
         method:"POST",
         headers:{
+          "Authorization": `Bearer ${token}`,
           "Content-Type":"application/json"
         },
         body:JSON.stringify(nuevoParticipante)
@@ -31,6 +33,10 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
       const guardado=await respuesta.json()
       dispatch({type:"AGREGAR",payload:guardado})
     }
+      if (respuesta.status === 403) {
+        alert("No tienes permisos de administrador para esta acción.");
+        return;
+      }
     }  catch(error){
       console.error("Error al agregar participante:",error)
     }
@@ -41,10 +47,14 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
         .then(data=>{dispatch({type:"GET_PARTICIPANTES",payload:data})})
       },[])
       const eliminarParticipante=async(id:number)=>{
+        const token = localStorage.getItem("token")
         try{
-        const respuesta= await fetch(`${api_url}/${id}`,{
-          method:"DELETE"
-         })
+        const respuesta = await fetch(`${api_url}/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
          if (respuesta.ok){
          dispatch({type:"ELIMINAR",payload:id}) 
       }
@@ -53,18 +63,28 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
     }
   }
       const reseteardatos=async()=>{
+      const token = localStorage.getItem("token")
        const respuesta= await fetch(api_url,{
-        method:"DELETE"
+        method:"DELETE",
+        headers:{
+          "Authorization": `Bearer ${token}`
+        }
        })
        if (respuesta.ok){
         dispatch({type:"RESET"})
       }
+      if (respuesta.status === 403) {
+      alert("No tienes permisos de administrador para esta acción.");
+      return;
+    }
     }
     const actualizarparticipante=async(participante:Participante)=>{
+      const token = localStorage.getItem("token")
       try{
          const respuesta= await fetch(`${api_url}/${participante.id}`,{
           method:"PUT",
           headers:{
+          "Authorization": `Bearer ${token}`,
           "Content-Type":"application/json"
         },
           body: JSON.stringify(participante)
@@ -73,6 +93,10 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
           dispatch({type:"EDITAR",payload:participante})
           setParticipanteSeleccionado(null)
          }
+         if (respuesta.status === 403) {
+          alert("No tienes permisos de administrador para esta acción.");
+          return;
+        }
       }catch(error){
         console.error(error)
       }

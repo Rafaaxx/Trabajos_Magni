@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
+  const {user}=useAuth()
   const[abierto,setAbierto]=useState(false)
   return (
     <>
@@ -9,7 +11,9 @@ export default function Navbar() {
         <button onClick={() => setAbierto(!abierto)} className="md:hidden text-white text-2xl"> ☰ </button>
         <div className='hidden md:flex items-center justify-center'>
       <Link to ="/" className="text-xl bg-blue-700 p-3 px-10 border rounded mx-12 font-bold text-white">Inicio</Link>
+      {user?.rol === "ADMIN" && (
       <Link to="/nuevo" className="ml-4 bg-blue-700 p-3 px-10 border rounded mx-12 text-xl font-bold text-white">Registrar</Link>
+      )}
       <Link to="/lista" className="ml-4 bg-blue-700 p-3 px-10 border rounded mx-12 text-xl font-bold text-white">Lista</Link>
     </div>
     </nav>

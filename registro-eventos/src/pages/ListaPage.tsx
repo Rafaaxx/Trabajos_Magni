@@ -3,12 +3,14 @@ import { ParticipantesContext } from '../context/ParticipantesContext'
 import { ParticipanteCard } from '../Components/ParticipanteCard'
 import { Link } from 'react-router-dom'
 import { Filtros } from '../Components/Filtros'
+import { useAuth } from '../context/AuthContext'
 
 export default function ListaPage() {
     const context=useContext(ParticipantesContext)
     if (!context){
       return null
     }
+    const {user}=useAuth()
     const {participante}=context
     const [filtroModalidad,setFiltroModalidad]=useState("Todas")
     const [filtroNivel,setFiltroNivel]=useState("Todos")
@@ -47,11 +49,13 @@ export default function ListaPage() {
               )
             }
              </div>
+             {user?.rol === "ADMIN" && (
              <div className='w-full flex justify-center my-10'>
              <button className='bg-red-600 text-white p-3 w-1/2 rounded font-bold my-10 flex justify-center items-center' 
              onClick={()=>{context.resetear()}}>
              Resetear datos</button>
              </div>
+             )}
         </>
   )
 }

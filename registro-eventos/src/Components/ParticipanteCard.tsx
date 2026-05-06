@@ -2,7 +2,9 @@ import type { Participante } from "../Models/Participante"
 import { useContext } from "react"
 import { ParticipantesContext } from "../context/ParticipantesContext"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 export const ParticipanteCard=({p}:{p:Participante})=>{
+  const {user}=useAuth()
   const context=useContext(ParticipantesContext)
   if (!context) return null
 const bgColor=
@@ -22,11 +24,15 @@ const bgColor=
         <p className={`${nivelColor} font-bold mb-3`}>Nivel:{p.nivel}</p>
         <p>Tecnologias: {p.tecnologias.join(" - ")}</p>
         <div className="flex justify-left items-left">
+        {user?.rol === "ADMIN" && (
+        <div>
         <button className="bg-blue-600 text-white rounded mt-3 py-2 px-3" onClick={()=>{
           navigate(`/editar/${p.id}`)
           }}>Editar</button>
         <button className="bg-red-600 text-white rounded mt-3 py-2 px-3" onClick={()=>context.eliminar(p.id)}>Eliminar</button>
-       </div>
+        </div>
+        )}
+        </div>
         </div>
   )
 }
