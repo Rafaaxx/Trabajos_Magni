@@ -6,11 +6,10 @@ export default function EditarPage() {
   const {id}=useParams()
   const navigate=useNavigate()
   const context=useContext(ParticipantesContext)
-  if (!context){
-    return <p>Cargando...</p>
-  }
-  const {participante, setParticipanteSeleccionado}=context
+
   useEffect(()=>{
+    if (!context || context.cargando) return;
+    const { participante, setParticipanteSeleccionado } = context;
     const encontrado=participante.find(p=>p.id===Number(id))
     if (encontrado){
         setParticipanteSeleccionado(encontrado)
@@ -19,9 +18,12 @@ export default function EditarPage() {
         navigate("/")
     }
     return()=>{
-        setParticipanteSeleccionado(null)
+        context.setParticipanteSeleccionado(null)
     }
-  },[id,participante, setParticipanteSeleccionado])
+  },[id,context?.cargando,navigate])
+  if (!context || context.cargando) {
+    return <p className="p-6">Cargando datos del servidor...</p>;
+  }
     return (
     <div className="p-6">
      <h1 className="text-xl font-bold mb-4">

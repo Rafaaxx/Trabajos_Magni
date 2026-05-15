@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 interface FiltrosProps{
   nombre: string;
   modalidad: string;
@@ -6,11 +7,11 @@ interface FiltrosProps{
   setModalidad: (val: string) => void;
   setNivel: (val: string) => void;
 }
-export const Filtros=({nombre, modalidad, nivel, setNombre, setModalidad, setNivel}:FiltrosProps)=>{
+export const Filtros= forwardRef<HTMLInputElement, FiltrosProps>(({nombre, modalidad, nivel, setNombre, setModalidad, setNivel}, ref)=>{
 return(
  <div className='my-5 flex flex-col w-full md:flex-row flex-wrap justify-center items-center gap-10'> 
          <div className='filtro-nombre flex justify-center'>
-           <input type="text" className="border rounded py-2 px-6"  name="nombre" value={nombre} onChange={(e)=>setNombre(e.target.value)} placeholder='Buscar por nombre' />
+           <input type="text" className="border rounded py-2 px-6" ref={ref} name="nombre" value={nombre} onChange={(e)=>setNombre(e.target.value)} placeholder='Buscar por nombre' />
          </div>
          <div className='filtro-modalidad flex justify-center '>
           <label className="flex items-center">Modalidad: </label>
@@ -32,4 +33,4 @@ return(
           </div>
           <button className="bg-gray-400 font-bold rounded p-2"onClick={()=>{setModalidad("Todas"),setNivel("Todos"),setNombre("")}}>Limpiar filtros</button>
          </div>
-)}
+)})

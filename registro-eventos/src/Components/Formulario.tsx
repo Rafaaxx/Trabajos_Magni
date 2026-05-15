@@ -1,27 +1,26 @@
 import { Participante } from "../Models/Participante";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useId } from "react";
 import { useContext } from "react";
 import { ParticipantesContext } from "../context/ParticipantesContext";
+import { useForm } from "../hooks/useForm";
 export const Formulario=({onSuccess}:any)=>{
     const context=useContext(ParticipantesContext)
     if(!context) return null //nuevo tp 4
-  const [formData,setFormData]=useState<Omit<Participante, 'id'>>({
-        nombre: '',
-        email: '',
-        edad: 0,
-        pais: 'Argentina', 
-        modalidad: 'Presencial', 
-        tecnologias: [],
-        nivel: 'Principiante', 
-        aceptaTerminos: false
-      })
-    const handleChange=(e:React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)=>{
-    const {name,value,type}=e.target;
-    setFormData({
-      ...formData,
-      [name]:type==="number" ? Number(value) : value
-    });
-  };
+    const nombreRef=useRef<HTMLInputElement>(null)
+    useEffect(()=>{
+      nombreRef.current?.focus()
+    },[])
+ const {formData, setFormData, handleChange, resetForm}= useForm<Omit<Participante, "id">>({
+      nombre: '',
+      email: '',
+      edad: 0,
+      pais: 'Argentina',
+      modalidad: 'Presencial',
+      tecnologias: [],
+      nivel: 'Principiante',
+      aceptaTerminos: false
+    })
+    
   const handleCheckboxChange=(tec:string)=>{
     const {tecnologias}=formData;
     if (tecnologias.includes(tec)){
@@ -36,6 +35,7 @@ export const Formulario=({onSuccess}:any)=>{
       });
     }
   };
+  
   const handleSubmit=(e:React.FormEvent)=>{
     e.preventDefault()
 
@@ -43,8 +43,8 @@ export const Formulario=({onSuccess}:any)=>{
       alert("Debe aceptar los términos y condiciones.")
       return
     }
-    
-    
+  
+
     //onAgregar(nuevoParticipante) 
     if(!context.participanteSeleccionado){
     const nuevoParticipante=new Participante(
@@ -66,16 +66,7 @@ export const Formulario=({onSuccess}:any)=>{
       } as Participante   
       context.actualizar(participanteActualizado)
     }
-    setFormData({
-    nombre: '',
-    email: '',
-    edad: 0,
-    pais: 'Argentina',
-    modalidad: 'Presencial',
-    tecnologias: [],
-    nivel: 'Principiante',
-    aceptaTerminos: false
-    })
+    resetForm()
     onSuccess()
   }
   useEffect(()=>{
@@ -91,56 +82,67 @@ export const Formulario=({onSuccess}:any)=>{
         aceptaTerminos: context.participanteSeleccionado.aceptaTerminos
       })
      }else{
-      setFormData({
-        nombre: '',
-        email: '',
-        edad: 0,
-        pais: 'Argentina',
-        modalidad: 'Presencial',
-        tecnologias: [],
-        nivel: 'Principiante',
-        aceptaTerminos: false
-      })
+      resetForm()
      }
   },[context.participanteSeleccionado])
+  const nombreId=useId()
+  const emailId=useId()
+  const edadId=useId()
+  const paisId=useId()
+  const modalidadId=useId()
+  const tecnologiasId=useId()
+  const nivelId=useId()
+  const terminosId=useId()
 return(
 <div > 
          <h1 className=' bg-blue-500 p-4 text-3xl font-bold text-center mb-6'>Registro de participantes</h1>
          <h3 className='font-bold text-xl my-5'>Participantes registrados: {context.contador}</h3>
          <form onSubmit={handleSubmit} className='shadow-md' >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <input type="text" className="my-3 mx-2 border p-2 rounded" name='nombre' value={formData.nombre} placeholder='Nombre' onChange={handleChange} required /> 
-          <input type="email" className="my-3 mx-2 border p-2 rounded" name='email' value={formData.email} placeholder='Email' onChange={handleChange} required /> 
-          <input type="number" className="my-3 mx-2 border p-2 rounded" name='edad' value={formData.edad}  placeholder='Edad'onChange={handleChange} required />
-          <select name="pais" className="border p-1 text-sm rounded" value={formData.pais} onChange={handleChange}>
-            <option value="Argentina">Argentina</option>
-            <option value="Chile">Chile</option>
-            <option value="Uruguay">Uruguay</option>
-            <option value="México">México</option>
-            <option value="España">España</option>
-          </select> 
+          <div>
+            <label htmlFor={nombreId}>Nombre:</label>
+            <input type="text" className="my-3 mx-2 border p-2 rounded" name='nombre' ref={nombreRef} id={nombreId} value={formData.nombre} placeholder='Nombre' onChange={handleChange} required /> 
+          </div>
+          <div>
+            <label htmlFor={emailId}>Email:</label>
+            <input type="email" className="my-3 mx-2 border p-2 rounded" name='email' id={emailId} value={formData.email} placeholder='Email' onChange={handleChange} required /> 
+          </div>
+          <div>
+            <label htmlFor={edadId}>Edad:</label>
+            <input type="number" className="my-3 mx-2 border p-2 rounded" name='edad' id={edadId} value={formData.edad}  placeholder='Edad'onChange={handleChange} required />
+          </div>
+          <div>
+            <label htmlFor={paisId}>País:</label>
+            <select name="pais" className="border p-1 text-sm rounded" id={paisId} value={formData.pais} onChange={handleChange}>
+              <option value="Argentina">Argentina</option>
+              <option value="Chile">Chile</option>
+              <option value="Uruguay">Uruguay</option>
+              <option value="México">México</option>
+              <option value="España">España</option>
+            </select> 
+          </div>
           </div>
           <p className='font-bold'>Modalidad</p>
           <div className='flex gap-4'>
-          <label><input className="my-3 mx-2" type="radio" name='modalidad' value="Presencial" checked={formData.modalidad==="Presencial"} onChange={handleChange} />Presencial</label>
-          <label><input className="my-3 mx-2" type="radio" name='modalidad' value="Virtual" checked={formData.modalidad==="Virtual"} onChange={handleChange} />Virtual</label>
-          <label><input className="my-3 mx-2" type="radio" name='modalidad' value="Hibrido" checked={formData.modalidad==="Hibrido"} onChange={handleChange} />Hibrido</label>
+          <label htmlFor={modalidadId + "-presencial"}><input className="my-3 mx-2" type="radio"  id={modalidadId + "-presencial"} name='modalidad' value="Presencial" checked={formData.modalidad==="Presencial"} onChange={handleChange} />Presencial</label>
+          <label htmlFor={modalidadId + "-virtual"}><input className="my-3 mx-2" type="radio"  id={modalidadId + "-virtual"} name='modalidad' value="Virtual" checked={formData.modalidad==="Virtual"} onChange={handleChange} />Virtual</label>
+          <label htmlFor={modalidadId + "-hibrido"}><input className="my-3 mx-2" type="radio"  id={modalidadId + "-hibrido"} name='modalidad' value="Hibrido" checked={formData.modalidad==="Hibrido"} onChange={handleChange} />Hibrido</label>
           </div>
           <p className="my-3 mx-2 font-bold">Tecnologias conocidas:</p>
           <div className='grid grid-cols-2 md:grid-cols-3'>
             {["React", "Node", "Angular", "Vue", "Java", "Python"].map((tec) => (
-             <label key={tec}><input type="checkbox" className="" checked={formData.tecnologias.includes(tec)} onChange={() => handleCheckboxChange(tec)} />{tec}</label>
+             <label key={tec} htmlFor={tecnologiasId + "-" + tec}><input type="checkbox" className="" id={tecnologiasId+"-"+tec}checked={formData.tecnologias.includes(tec)} onChange={() => handleCheckboxChange(tec)} />{tec}</label>
              ))}
           </div>
           <div className="my-3 mx-2">
-            <p className="my-3 mx-2 font-bold ">Nivel</p>
-            <select name="nivel"  className="border rounded px-6 py-2" value={formData.nivel} onChange={handleChange}>
+            <label htmlFor={nivelId} className="my-3 mx-2 font-bold ">Nivel</label>
+            <select name="nivel"  className="border rounded px-6 py-2" id={nivelId} value={formData.nivel} onChange={handleChange}>
             <option value="Principiante">Principiante</option>
             <option value="Intermedio">Intermedio</option>
             <option value="Avanzado">Avanzado</option>
           </select> 
           </div>
-          <label> <input type="checkbox" className="my-3 mx-2"  name="aceptaTerminos" checked={formData.aceptaTerminos} onChange={(e)=> setFormData({...formData,aceptaTerminos:e.target.checked})}/>Acepto los términos y condiciones del evento</label>
+          <label htmlFor={terminosId}> <input type="checkbox" className="my-3 mx-2"  name="aceptaTerminos" id={terminosId} checked={formData.aceptaTerminos} onChange={(e)=> setFormData({...formData,aceptaTerminos:e.target.checked})}/>Acepto los términos y condiciones del evento</label>
           <div className='mt-4'>
          <button type='submit' className='bg-blue-600 rounded text-white md:col-span-3 py-2 px-4 hover:bg-blue-700'>{context.participanteSeleccionado ? "Guardar Cambios" : "Registrar"}</button>
          </div>

@@ -24,6 +24,8 @@ export default function LoginPage() {
       <input type="text" placeholder="Usuario" className="border rounded-full border-gray-600 p-5" value={username} onChange={(e) => setUsername(e.target.value)}/>
       <input type="password" placeholder="Contraseña" className="border rounded-full border-gray-600 p-5" value={password} onChange={(e) => setPassword(e.target.value)}/>
       <button className="border rounded bg-blue-600 text-white p-3 px-7" onClick={handleLogin}>Iniciar sesion</button>
+      <p>User admin: Rafael - Contraseña: Rafa</p>
+      <p>User consulta: nadie - Contraseña: nadie</p>
       </div>
     </div>
   )

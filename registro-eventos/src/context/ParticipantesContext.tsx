@@ -1,20 +1,26 @@
 import { createContext, useEffect, useReducer, useState, type ReactNode } from "react";
 import { Participante } from "../Models/Participante";
 import { participantesReducer } from "../reducers/participantesReducer";
+import { useNotification } from "../hooks/useNotification";
 interface ContextType{
     participante:Participante[],
     participanteSeleccionado:Participante|null,
     setParticipanteSeleccionado:(p:Participante|null)=>void,
     actualizar:(p:Participante)=>void,
+    cargando: boolean,
     agregar: (p:Participante)=>void,
     eliminar:(id:number)=>void,
     resetear:()=>void,
     contador:number
+    message:string|null,
+    type:"success" | "error" | 'info'
 }
 export const ParticipantesContext= createContext<ContextType |undefined> (undefined)
 
 export const ParticipantesProvider=({children}:{children:ReactNode})=>{
+    const [cargando, setCargando] = useState(true);
     const [participantes,dispatch]=useReducer(participantesReducer,[])
+    const {message,type,notify}=useNotification()
     const api_url="http://localhost:8000/participantes"
     let contador=participantes.length
     const [participanteSeleccionado,setParticipanteSeleccionado]=useState<Participante|null>(null)
@@ -31,10 +37,11 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
     })
     if (respuesta.ok){
       const guardado=await respuesta.json()
+      notify("¡Participante agregado con éxito!", "success")
       dispatch({type:"AGREGAR",payload:guardado})
     }
       if (respuesta.status === 403) {
-        alert("No tienes permisos de administrador para esta acción.");
+        notify("No tienes permisos de administrador para esta acción.", "error");
         return;
       }
     }  catch(error){
@@ -42,9 +49,11 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
     }
   }
     useEffect(()=>{
+        setCargando(true);
         fetch(api_url)
         .then(res=>res.json())
         .then(data=>{dispatch({type:"GET_PARTICIPANTES",payload:data})})
+        .finally(()=> setCargando(false));
       },[])
       const eliminarParticipante=async(id:number)=>{
         const token = localStorage.getItem("token")
@@ -56,7 +65,8 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
           }
         });
          if (respuesta.ok){
-         dispatch({type:"ELIMINAR",payload:id}) 
+           notify("¡Participante eliminado con éxito!", "success")
+           dispatch({type:"ELIMINAR",payload:id}) 
       }
     }catch(error){
       console.error("Error al eliminar participante:",error)
@@ -74,7 +84,7 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
         dispatch({type:"RESET"})
       }
       if (respuesta.status === 403) {
-      alert("No tienes permisos de administrador para esta acción.");
+      notify("No tienes permisos de administrador para esta acción.", "error");
       return;
     }
     }
@@ -94,7 +104,7 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
           setParticipanteSeleccionado(null)
          }
          if (respuesta.status === 403) {
-          alert("No tienes permisos de administrador para esta acción.");
+          notify("No tienes permisos de administrador para esta acción.", "error");
           return;
         }
       }catch(error){
@@ -107,10 +117,13 @@ export const ParticipantesProvider=({children}:{children:ReactNode})=>{
          participanteSeleccionado:participanteSeleccionado,
          setParticipanteSeleccionado:setParticipanteSeleccionado,
          actualizar:actualizarparticipante,
+         cargando:cargando,
          agregar:agregarParticipante,
          eliminar:eliminarParticipante,
          resetear:reseteardatos,
-         contador:contador
+         contador:contador,
+         message:message,
+         type:type
 
      }}>
         {children}

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useRef, useEffect } from 'react'
 import { ParticipantesContext } from '../context/ParticipantesContext'
 import { ParticipanteCard } from '../Components/ParticipanteCard'
 import { Link } from 'react-router-dom'
@@ -12,6 +12,7 @@ export default function ListaPage() {
     }
     const {user}=useAuth()
     const {participante}=context
+    const filtroInputRef=useRef<HTMLInputElement>(null)
     const [filtroModalidad,setFiltroModalidad]=useState("Todas")
     const [filtroNivel,setFiltroNivel]=useState("Todos")
     const [filtroNombre,setFiltroNombre]=useState("")
@@ -22,11 +23,21 @@ export default function ListaPage() {
     const  coincideNombre= filtroNombre===""|| p.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
     return coincideModalidad && coincideNivel && coincideNombre
     })
+    useEffect(()=>{
+       const manejarAtajo=(e: KeyboardEvent)=>{
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b"){
+          e.preventDefault()
+          filtroInputRef.current?.focus()
+       }}
+       window.addEventListener("keydown",manejarAtajo)
+       return()=>window.removeEventListener("keydown",manejarAtajo)
+    },[])
     return (
      <>
           <h1 className='font-bold text-2xl text-center my-10'>Búsqueda</h1>
             <Filtros 
             nombre={filtroNombre}
+            ref={filtroInputRef}
             setNombre={setFiltroNombre}
             nivel={filtroNivel}
             setNivel={setFiltroNivel}
