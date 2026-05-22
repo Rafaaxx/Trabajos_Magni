@@ -9,6 +9,9 @@ import PublicaPage from "./pages/PublicaPage"
 import PrivateRoute from "./routes/PrivateRoute"
 import { useContext } from "react"
 import { ParticipantesContext } from "./context/ParticipantesContext"
+import CursosPage from "./pages/CursosPage"
+import PagoFallidoPage from "./pages/PagoFallidoPage"
+import PagoExitosoPage from "./pages/PagoExitosoPage"
 
 function App() {
   const context=useContext(ParticipantesContext)
@@ -29,6 +32,9 @@ function App() {
       <Route path="/nuevo" element={<PrivateRoute rol="ADMIN"><Navbar /><FormularioPage/></PrivateRoute>}/>
       <Route path="/editar/:id" element={<PrivateRoute rol="ADMIN"><Navbar /><EditarPage/></PrivateRoute>}/>
       <Route path="/lista" element={<PrivateRoute><Navbar /><ListaPage/></PrivateRoute>}/>
+      <Route path="/cursos" element={<PrivateRoute><Navbar /><CursosPage/></PrivateRoute>}/>
+      <Route path="/pagofallido" element={<PrivateRoute><Navbar /><PagoFallidoPage/></PrivateRoute>}/>
+      <Route path="/pagoexitoso" element={<PrivateRoute><Navbar /><PagoExitosoPage/></PrivateRoute>}/>
       <Route path="/login" element={<LoginPage/>}/>
     </Routes>
     </>

@@ -28,6 +28,7 @@ function Home() {
       <Link to="/nuevo" className="bg-green-600 text-white px-6 py-2 rounded font-bold hover:bg-green-700">Registrar nuevo participante</Link>
       )}
       <Link to="/lista" className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700 ml-4">Ver lista de participantes</Link>
+      <Link to="/cursos" className="bg-purple-600 text-white px-6 py-2 rounded font-bold hover:bg-purple-700 ml-4">Ver cursos</Link>
       </div>
     <button className='m-6 bg-red-600 border rounded px-6 py-2 font-bold text-white' onClick={handleLogout}>
       Cerrar sesión
