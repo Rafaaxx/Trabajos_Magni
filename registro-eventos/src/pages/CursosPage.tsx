@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import axios from "axios";
 initMercadoPago("APP_USR-16a4f979-d41b-484d-91e7-dbfb3371d74b",{locale:"es-AR"})
 export default function CursosPage() {
    const [cargando,setCargando]=useState(false)
@@ -15,17 +16,11 @@ export default function CursosPage() {
    const comprarCurso= async(curso:{titulo:string,precio:number})=>{
       setCargando(true)
       try{
-        const response= await fetch("https://epic-earpiece-arise.ngrok-free.dev/payment/create_preference", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            titulo: curso.titulo,
-            precio: curso.precio
-          })
-        });
-        const data = await response.json();
+        const response= await axios.post("http://localhost:8000/payment/create_preference",{
+          titulo:curso.titulo,
+          precio:curso.precio
+        })
+        const data = await response.data;
         if (data.id){
           setPreferenceId(data.id);
         }
